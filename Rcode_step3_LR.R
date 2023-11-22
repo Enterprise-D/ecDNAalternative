@@ -22,4 +22,4 @@ out1 <- summary(fit1)$coef
 out2 <- summary(fit2)$coef
 
 write.table(out1, file='coef_model_colon.txt', row.names=F, col.names=T, sep='\t', quote=F)
-write.table(out2, file='coef_model_brain.txt', row.names=F, col.names=T, sep='\t', quote=F)
+write.table(out2, file= 'coef_model_brain.txt', row.names=F, col.names=T, sep='\t', quote=F)

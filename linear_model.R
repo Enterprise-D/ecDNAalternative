@@ -1,62 +1,110 @@
 library(dplyr)
+library(stringi)
 
 chrv = "chr7"
 startv = 55000000
 
-pos_cnv = read.table("data/lm_train_LC499/GBM39_ecDNA_LC499_cnv.txt", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-pos_ratio = read.table("data/lm_train_LC499/GBM39_ecDNA_LC499_ratio.txt", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-pos_gini = read.table("data/lm_train_LC499/GBM39_ecDNA_LC499_gini.txt", sep = "\t", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-pos_label = as.data.frame(rep(1,nrow(pos_cnv)))
+glm_train = function(chrv = "chr7", startv = 55000000, pos = "LC499", neg = "LC500") {
+  pos_cnv = read.table(paste0("data/lm_summarized/lm_train_", pos, "/", pos, "_cnv.txt"), header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  pos_ratio = read.table(paste0("data/lm_summarized/lm_train_", pos, "/", pos, "_ratio.txt"), header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  pos_gini = read.table(paste0("data/lm_summarized/lm_train_", pos, "/", pos, "_gini.txt"), sep = "\t", header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  pos_label = as.data.frame(rep(1, nrow(pos_cnv)))
 
-neg_cnv = read.table("data/lm_train_LC499/GBM39_ecDNA_LC500_cnv.txt", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-neg_ratio = read.table("data/lm_train_LC499/GBM39_ecDNA_LC500_ratio.txt", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-neg_gini = read.table("data/lm_train_LC499/GBM39_ecDNA_LC500_gini.txt", sep = "\t", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-neg_label = as.data.frame(rep(0,nrow(neg_cnv)))
+  neg_cnv = read.table(paste0("data/lm_summarized/lm_train_", neg, "/", neg, "_cnv.txt"), header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  neg_ratio = read.table(paste0("data/lm_summarized/lm_train_", neg, "/", neg, "_ratio.txt"), header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  neg_gini = read.table(paste0("data/lm_summarized/lm_train_", neg, "/", neg, "_gini.txt"), sep = "\t", header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  neg_label = as.data.frame(rep(0, nrow(neg_cnv)))
 
-pos_set = cbind(pos_cnv,pos_ratio,pos_gini,pos_label)
-neg_set = cbind(neg_cnv,neg_ratio,neg_gini,neg_label)
+  pos_set = cbind(pos_cnv, pos_ratio, pos_gini, pos_label)
+  neg_set = cbind(neg_cnv, neg_ratio, neg_gini, neg_label)
 
-colnames(pos_set) = c("cnv", "ratio", "gini", "label")
-colnames(neg_set) = c("cnv", "ratio", "gini", "label")
+  colnames(pos_set) = c("cnv", "ratio", "gini", "label")
+  colnames(neg_set) = c("cnv", "ratio", "gini", "label")
 
-training_set = rbind(pos_set,neg_set)
+  training_set = rbind(pos_set, neg_set)
 
-remove(pos_cnv, pos_ratio, pos_gini, pos_label, neg_cnv, neg_ratio, neg_gini, neg_label, pos_set, neg_set)
+  remove(pos_cnv, pos_ratio, pos_gini, pos_label, neg_cnv, neg_ratio, neg_gini, neg_label, pos_set, neg_set)
 
-training_set = training_set[training_set$cnv<=100 ,]
+  training_set = training_set[training_set$cnv <= 100,]
 
-linear_model = glm(label ~ cnv + ratio + gini, data = training_set, family = 'binomial')
+  linear_model = glm(label ~ cnv + ratio + gini, data = training_set, family = 'binomial')
 
-summary(linear_model)
+  summary(linear_model)
 
-coef = summary(linear_model)$coef
-write.table(coef, file='lm_coef_model.txt', row.names=T, col.names=T, sep='\t', quote=F)
+  coef = summary(linear_model)$coef
+  write.table(coef, file = 'lm_coef_model.txt', row.names = T, col.names = T, sep = '\t', quote = F)
 
-### Validation
+  return(linear_model)
+}
 
-pos_cnv = read.table("data/lm_val_LC499/GBM39_ecDNA_LC499_cnv.txt", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-pos_ratio = read.table("data/lm_val_LC499/GBM39_ecDNA_LC499_ratio.txt", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-pos_gini = read.table("data/lm_val_LC499/GBM39_ecDNA_LC499_gini.txt", sep = "\t", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-pos_label = as.data.frame(rep(1,nrow(pos_cnv)))
+glm_validate = function(linear_model, chrv = "chr7", startv = 55000000, pos = "LC499", neg = "LC500") {
 
-neg_cnv = read.table("data/lm_val_LC500/GBM39_ecDNA_LC500_cnv.txt", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-neg_ratio = read.table("data/lm_val_LC500/GBM39_ecDNA_LC500_ratio.txt", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-neg_gini = read.table("data/lm_val_LC500/GBM39_ecDNA_LC500_gini.txt", sep = "\t", header = T) %>% filter(chr == chrv & start == startv) %>% select(-chr, -start, -end) %>% t()
-neg_label = as.data.frame(rep(0,nrow(neg_cnv)))
+  pos_cnv = read.table(paste0("data/lm_summarized/lm_val_", pos, "/", pos, "_cnv.txt"), header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  pos_ratio = read.table(paste0("data/lm_summarized/lm_val_", pos, "/", pos, "_ratio.txt"), header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  pos_gini = read.table(paste0("data/lm_summarized/lm_val_", pos, "/", pos, "_gini.txt"), sep = "\t", header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  pos_label = as.data.frame(rep(1, nrow(pos_cnv)))
 
-pos_set = cbind(pos_cnv,pos_ratio,pos_gini,pos_label)
-neg_set = cbind(neg_cnv,neg_ratio,neg_gini,neg_label)
+  neg_cnv = read.table(paste0("data/lm_summarized/lm_val_", neg, "/", neg, "_cnv.txt"), header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  neg_ratio = read.table(paste0("data/lm_summarized/lm_val_", neg, "/", neg, "_ratio.txt"), header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  neg_gini = read.table(paste0("data/lm_summarized/lm_val_", neg, "/", neg, "_gini.txt"), sep = "\t", header = T) %>%
+    filter(chr == chrv & start == startv) %>%
+    select(-chr, -start, -end) %>%
+    t()
+  neg_label = as.data.frame(rep(0, nrow(neg_cnv)))
 
-colnames(pos_set) = c("cnv", "ratio", "gini", "label")
-colnames(neg_set) = c("cnv", "ratio", "gini", "label")
+  pos_set = cbind(pos_cnv, pos_ratio, pos_gini, pos_label)
+  neg_set = cbind(neg_cnv, neg_ratio, neg_gini, neg_label)
 
-validation_set = rbind(pos_set,neg_set)
+  colnames(pos_set) = c("cnv", "ratio", "gini", "label")
+  colnames(neg_set) = c("cnv", "ratio", "gini", "label")
 
-remove(pos_cnv, pos_ratio, pos_gini, pos_label, neg_cnv, neg_ratio, neg_gini, neg_label, pos_set, neg_set)
+  validation_set = rbind(pos_set, neg_set)
 
-validation_set[validation_set$cnv>100 ,"cnv"] = 100
+  remove(pos_cnv, pos_ratio, pos_gini, pos_label, neg_cnv, neg_ratio, neg_gini, neg_label, pos_set, neg_set)
 
-validation_set$pred = predict(linear_model, validation_set, type = "response")
-validation_set$pred[is.na(validation_set$pred)] = 0
+  validation_set[validation_set$cnv > 100, "cnv"] = 100
 
-write.table(validation_set, file='test_result_lm.csv', row.names=F, col.names=F, sep=",", quote=F)
+  validation_set$pred = predict(linear_model, validation_set, type = "response")
+  validation_set$pred[is.na(validation_set$pred)] = 0
+
+  ident = paste0(stri_replace(pos, fixed = "LC", replacement = ""), stri_replace(neg, fixed = "LC", replacement = ""))
+
+  write.table(validation_set, file = paste0('data/lm_summarized/prediction_', ident, '.csv'), row.names = F, col.names = F, sep = ",", quote = F)
+}
+
+linear_model = glm_train()
+
+glm_validate(linear_model)
