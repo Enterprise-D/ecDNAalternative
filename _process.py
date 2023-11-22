@@ -17,6 +17,7 @@ cnv_name = sys.argv[4]
 mat_name = sys.argv[5]
 input_dir = sys.argv[6]
 output_dir = sys.argv[7]
+alternative = sys.argv[8]
 
 # %%
 
@@ -36,12 +37,18 @@ if output_dir.endswith('/'):
 
 cell_name = cell_dir.split('/')[-1]
 
-# Exclude validation cells
-val_cells = pd.read_csv("test_nov22.csv", header=None).iloc[:, 4].str.split("/", expand=True).iloc[:, 1].tolist()
+# Exclude validation cells. Requires pred_summary from the CNN model.
+val_cells = pd.read_csv("val_result.csv", header=None).iloc[:, 4].str.split("/", expand=True).iloc[:, 1].tolist()
 
-if cell_name not in val_cells:
-    print("Cell", cell_name, "is in training set. Skipped.")
-    exit(0)
+if alternative == "training":
+    if cell_name in val_cells:
+        print("Cell", cell_name, "is in validation set. Skipped.")
+        exit(0)
+
+elif alternative == "validation":
+    if cell_name not in val_cells:
+        print("Cell", cell_name, "is in training set. Skipped.")
+        exit(0)
 
 sample_name = input_dir.split('/')[-1]
 
