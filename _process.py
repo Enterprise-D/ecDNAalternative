@@ -37,7 +37,7 @@ if output_dir.endswith('/'):
 cell_name = cell_dir.split('/')[-1]
 
 # Exclude validation cells
-val_cells = pd.read_csv("test_result_nov22.csv", header=None).iloc[:, 4].str.split("/", expand=True).iloc[:, 1].tolist()
+val_cells = pd.read_csv("test_nov22.csv", header=None).iloc[:, 4].str.split("/", expand=True).iloc[:, 1].tolist()
 
 if cell_name not in val_cells:
     print("Cell", cell_name, "is in training set. Skipped.")
