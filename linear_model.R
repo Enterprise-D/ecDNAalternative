@@ -1,10 +1,7 @@
 library(dplyr)
 library(stringi)
 
-chrv = "chr7"
-startv = 55000000
-
-glm_train = function(chrv = "chr7", startv = 55000000, pos = "LC499", neg = "LC500") {
+glm_train = function(chrv, startv, pos, neg) {
   pos_cnv = read.table(paste0("data/lm_summarized/lm_train_", pos, "/", pos, "_cnv.txt"), header = T) %>%
     filter(chr == chrv & start == startv) %>%
     select(-chr, -start, -end) %>%
@@ -55,7 +52,7 @@ glm_train = function(chrv = "chr7", startv = 55000000, pos = "LC499", neg = "LC5
   return(linear_model)
 }
 
-glm_validate = function(linear_model, chrv = "chr7", startv = 55000000, pos = "LC499", neg = "LC500") {
+glm_validate = function(linear_model, chrv, startv, pos, neg) {
 
   pos_cnv = read.table(paste0("data/lm_summarized/lm_val_", pos, "/", pos, "_cnv.txt"), header = T) %>%
     filter(chr == chrv & start == startv) %>%
@@ -105,6 +102,10 @@ glm_validate = function(linear_model, chrv = "chr7", startv = 55000000, pos = "L
   write.table(validation_set, file = paste0('data/lm_summarized/prediction_', ident, '.csv'), row.names = F, col.names = F, sep = ",", quote = F)
 }
 
-linear_model = glm_train()
+linear_model = glm_train(chrv = "chr7", startv = 55000000, pos = "LC499", neg = "LC500")
 
-glm_validate(linear_model)
+glm_validate(linear_model, chrv = "chr7", startv = 55000000, pos = "LC499", neg = "LC500")
+
+glm_validate(linear_model, chrv = "chr8", startv = 127000000, pos = "LC729", neg = "LC730")
+
+glm_validate(linear_model, chrv = "chr8", startv = 127000000, pos = "LC676", neg = "LC677")
