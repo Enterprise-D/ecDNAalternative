@@ -18,8 +18,11 @@ on both our validation dataset (10% of our LC499/LC500 brain tumor dataset) and 
 that is hard to distinguish from ecDNA:
 
 * **for validation dataset**:
+
 ![ROC1_NN.png](images%2FROC1_NN.png)
+
 * **for LC676/LC677 dataset**:
+
 ![ROC2_NN.png](images%2FROC2_NN.png)
 
 ### Probability Cutoff Selection
@@ -31,8 +34,11 @@ and pushes their predicted probability to a small number. Below is a comparison 
 a single cell (LC500_ACTAGGTGTTACCCAA) at different chromosomal bins (upper: logistic regression; lower: neural network):
 
 * **linear model**:
+
 ![LC500_ACTAGGTGTTACCCAA_LM.png](images%2FLC500_ACTAGGTGTTACCCAA_LM.png)
+
 * **neural model**:
+
 ![LC500_ACTAGGTGTTACCCAA_NN.png](images%2FLC500_ACTAGGTGTTACCCAA_NN.png)
 
 On our validation dataset, we tested how different probability cutoffs affect prediction of positive and negative samples.
@@ -46,11 +52,17 @@ Thus, we generally recommend a cutoff of 0.1 to 0.3 for the neural network model
 Figures below demonstrates effect on the Manhattan plot by choosing different cutoff using a mixed positive-negative dataset:
 
 ![Rect_Manhtn.0.05.jpg](images%2FRect_Manhtn.0.05.jpg)
+
 ![Rect_Manhtn.0.10.jpg](images%2FRect_Manhtn.0.10.jpg)
+
 ![Rect_Manhtn.0.15.jpg](images%2FRect_Manhtn.0.15.jpg)
+
 ![Rect_Manhtn.0.20.jpg](images%2FRect_Manhtn.0.20.jpg)
+
 ![Rect_Manhtn.0.30.jpg](images%2FRect_Manhtn.0.30.jpg)
+
 ![Rect_Manhtn.0.40.jpg](images%2FRect_Manhtn.0.40.jpg)
+
 ![Rect_Manhtn.0.50.jpg](images%2FRect_Manhtn.0.50.jpg)
 
 ## References
