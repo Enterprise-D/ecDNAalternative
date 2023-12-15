@@ -5,7 +5,7 @@ We recently developed a neural network-based method to achieve a more specific a
 Before running the script, please have **PyTorch** and **scipy** installed in addition to the packages listed above.
 
 ```bash
-python nn_detect.py <INPUT_PATH> <OUTPUT_PATH> <PROB_CUTOFF> <NUM_PROCESSES>
+python ecdna_detect_nn.py <INPUT_PATH> <OUTPUT_PATH> <PROB_CUTOFF> <NUM_PROCESSES>
 ```
 The script will output a file which can also be processed by `CMPlot.R` to generate a Manhattan plot.
 
