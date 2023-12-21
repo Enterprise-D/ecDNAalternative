@@ -1,6 +1,6 @@
 library("CMplot")
 
-count_freq_file = "ecDNA_summary_lm_val_499500_0.50.txt"
+count_freq_file = "LC729_summary_HSR.txt"
 
 a <- read.table(count_freq_file, header = T)
 for (i in seq_len(nrow(a))) {
@@ -19,5 +19,6 @@ print(a[a$freq > 0.01,])
 CMplot(b, plot.type = "m", col = c("grey30", "grey60"), LOG10 = FALSE, ylim = c(0, 1), threshold = c(0.05, 0.1),
        threshold.lty = c(2, 1), threshold.lwd = c(1, 1), threshold.col = c("black", "black"), amplify = TRUE,
        chr.den.col = NULL, signal.col = c("red", "orange"), signal.cex = c(1.5, 1.5), signal.pch = c(19, 19),
-       main = "cutoff=0.50", ylab = 'Proportion', axis.cex = 0.7,
-       file = "jpg", file.name = "0.50", dpi = 300, file.output = TRUE, verbose = TRUE, width = 14, height = 6)
+       main = "LC729_summary_HSR", ylab = 'Proportion', axis.cex = 0.7,
+       file = "jpg", file.name = "LC729_summary_HSR", dpi = 300, file.output = TRUE, verbose = TRUE, width = 14, height = 6)
+
